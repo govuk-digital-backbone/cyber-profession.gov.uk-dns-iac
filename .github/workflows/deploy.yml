@@ -1,0 +1,75 @@
+name: Deployment Workflow
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.tf'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+    inputs:
+      RUN_MODE:
+        description: 'Run mode (plan or apply)'
+        type: choice
+        required: true
+        default: 'plan'
+        options:
+          - plan
+          - apply
+
+permissions:
+      id-token: write
+      contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: aws
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          path: ${{ github.ref_name }}
+
+      - name: Debug Variables
+        run: |
+          echo "Run Mode: ${{ github.event_name == 'push' && 'apply' || inputs.RUN_MODE }}"
+  
+      - name: Show the files
+        run: |
+          ls -lah
+          ls -lah ${{ github.ref_name }}/
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.12.2"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/cyberprofessiongovuk-terraform-deployment
+          aws-region: eu-west-2
+
+      - name: Test IAM credentials
+        run: aws sts get-caller-identity
+
+      - name: Terraform Init
+        run: |
+          cd ${{ github.ref_name }}
+          terraform init
+          terraform validate
+          terraform fmt -check
+
+      - name: Terraform Plan
+        run: |
+          cd ${{ github.ref_name }}
+          terraform plan
+
+      - name: Terraform Apply
+        if: ${{ github.event_name == 'push' && 'apply' || inputs.RUN_MODE == 'apply' }}
+        run: |
+          cd ${{ github.ref_name }}
+          terraform apply -auto-approve
