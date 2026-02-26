@@ -1,5 +1,3 @@
-
-/*
 // -- to be enabled once R53 stood up
 
 output "primary_ds_record" {
@@ -53,23 +51,23 @@ resource "aws_route53_hosted_zone_dnssec" "cyberprofessiongovuk" {
 
 resource "aws_kms_alias" "primary" {
   provider      = aws.us_east_1
-  name          = "alias/dnssec/primary/security-gov-uk/1"
+  name          = "alias/dnssec/primary/cyber-profession-gov-uk/1"
   target_key_id = aws_kms_key.primary_dnssec_key.key_id
 }
 
 resource "aws_kms_alias" "primary_replica" {
-  name          = "alias/dnssec/primary_replica/security-gov-uk/1"
+  name          = "alias/dnssec/primary_replica/cyber-profession-gov-uk/1"
   target_key_id = aws_kms_replica_key.primary_replica_london.key_id
 }
 
 resource "aws_kms_alias" "secondary" {
   provider      = aws.us_east_1
-  name          = "alias/dnssec/secondary/security-gov-uk/1"
+  name          = "alias/dnssec/secondary/cyber-profession-gov-uk/1"
   target_key_id = aws_kms_key.secondary_dnssec_key.key_id
 }
 
 resource "aws_kms_alias" "secondary_replica" {
-  name          = "alias/dnssec/secondary_replica/security-gov-uk/1"
+  name          = "alias/dnssec/secondary_replica/cyber-profession-gov-uk/1"
   target_key_id = aws_kms_replica_key.secondary_replica_london.key_id
 }
 
@@ -77,7 +75,7 @@ resource "aws_kms_alias" "secondary_replica" {
 
 resource "aws_kms_key" "primary_dnssec_key" {
   provider    = aws.us_east_1
-  description = "security.gov.uk DNSSEC primary key"
+  description = "cyber-profession.gov.uk DNSSEC primary key"
 
   tags = merge(local.default_tags, {
     "Name" : "${local.domain}-DNSSEC-primary",
@@ -145,7 +143,7 @@ resource "aws_kms_key" "primary_dnssec_key" {
 
 resource "aws_kms_key" "secondary_dnssec_key" {
   provider    = aws.us_east_1
-  description = "security.gov.uk DNSSEC secondary key"
+  description = "cyber-profession.gov.uk DNSSEC secondary key"
 
   tags = merge(local.default_tags, {
     "Name" : "${local.domain}-DNSSEC-secondary",
@@ -214,7 +212,7 @@ resource "aws_kms_key" "secondary_dnssec_key" {
 # ==== replica KMS keys in eu-west-2 (London)) ====
 
 resource "aws_kms_replica_key" "primary_replica_london" {
-  description     = "security.gov.uk DNSSEC replica key (primary in us-east-1)"
+  description     = "cyber-profession.gov.uk DNSSEC replica key (primary in us-east-1)"
   primary_key_arn = aws_kms_key.primary_dnssec_key.arn
 
   tags = merge(local.default_tags, {
@@ -228,7 +226,7 @@ resource "aws_kms_replica_key" "primary_replica_london" {
 }
 
 resource "aws_kms_replica_key" "secondary_replica_london" {
-  description     = "security.gov.uk DNSSEC secondary replica key (secondary in us-east-1)"
+  description     = "cyber-profession.gov.uk DNSSEC secondary replica key (secondary in us-east-1)"
   primary_key_arn = aws_kms_key.secondary_dnssec_key.arn
 
   tags = merge(local.default_tags, {
@@ -240,4 +238,3 @@ resource "aws_kms_replica_key" "secondary_replica_london" {
     ignore_changes = [tags]
   }
 }
-*/
