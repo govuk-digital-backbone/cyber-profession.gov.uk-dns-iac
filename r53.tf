@@ -11,6 +11,17 @@ resource "aws_route53_zone" "cyberprofessiongovuk" {
   }
 }
 
+resource "aws_route53_record" "googleconsole-cname" {
+  zone_id = aws_route53_zone.cyberprofessiongovuk.zone_id
+  name    = "fc4nf3jjgs25"
+  type    = "CNAME"
+  ttl     = local.standard_ttl
+
+  records = [
+    "gv-u5rm67qiofldwo.dv.googlehosted.com."
+  ]
+}
+
 /*
 // -- TBD
 resource "aws_route53_record" "gh-verification" {
